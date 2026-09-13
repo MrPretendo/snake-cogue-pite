@@ -1,0 +1,76 @@
+/* shell.css — el marco que rodea a la app. Es lo ÚNICO propio del proyecto
+   autónomo: src/app.css es copia exacta del juego y no se toca.
+   Sin @keyframes, sin filter, sin url(): todo lo que se mueve lo mueve el juego. */
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #05070D;
+  color: #E8EEF7;
+  font: 13px/18px var(--font, system-ui, sans-serif);
+  overscroll-behavior: none;
+}
+
+.sh-win {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 34px 1fr;
+  min-height: 0;
+}
+
+.sh-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: #10151F;
+  border-bottom: 1px solid #223047;
+  min-width: 0;
+}
+
+.sh-title__icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.sh-title__text {
+  font-weight: 600;
+  color: #F1F5FB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sh-title__badge {
+  margin-left: auto;
+  flex: none;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sh-body {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* El escenario: tamano logico fijo (lo declara el juego en RESOLUCION) que
+   boot.mjs escala para encajar en .sh-body. La especificidad extra gana a
+   `.sr-app { position: relative }` de src/app.css. */
+.sh-body > .sh-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+/* En pantallas estrechas el escenario ya se escala solo; el marco cede lo suyo. */
+@media (max-width: 720px) {
+  .sh-title__badge { display: none; }
+}
