@@ -44,6 +44,11 @@ rápido cuanto más larga la cola; las frutas la reponen. Puedes **cruzar tu
 propia cola** gastando energía. Al subir de nivel eliges una de tres cartas de
 mutación, y se acumulan.
 
+El gasto tiene un **piso proporcional a la cola** que ninguna carta rebaja
+(`1 + 0.025·cola` por segundo: cola 100 → 3.5, cola 500 → 13.5); las cartas
+sólo pueden bajar la fórmula hasta ahí, y Resonancia mitiga como mucho 5
+tramos. Apalancamiento, bajón y la mecánica de la run multiplican después.
+
 **Sin energía, la cola se quema**: tras 0.75 s de aviso arde a `colaMáxima ÷ 3`
 segmentos por segundo (mínimo 2/s), y esa velocidad no baja nunca — una cola
 recuperada arde igual de rápido. Al quedar sin cola, mueres.

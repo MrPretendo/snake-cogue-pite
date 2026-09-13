@@ -46,6 +46,12 @@ const NIVELES_APALANCAMIENTO = [1, 2, 3, 5];
 const APALANCAMIENTO_DEGEN = 10;   // lo desbloquea la carta Modo Degen
 const LIQUIDACION_DESDE = 3;       // con x3 o mas, energia 0 = run liquidada, sin gracia
 const GASTO_POR_APALANCAMIENTO = 0.35; // gasto base x(1 + 0.35*(L-1)): x2->1.35, x5->2.4, x10->4.15
+// Piso metabolico proporcional a la cola, que NINGUNA carta rebaja: las cartas
+// solo pueden bajar la formula hasta aqui. Cola 100 -> 3.5/s, 200 -> 6, 500 -> 13.5.
+// Sin esto, Resonancia a cola 500 (0.85^50) dejaba el gasto en cero.
+const GASTO_PISO_BASE = 1.0;
+const GASTO_PISO_POR_SEGMENTO = 0.025;
+const RESONANCIA_TRAMOS_MAX = 5;      // tope de tramos de 10 casillas que mitigan
 const PENALIZACION_BAJAR = 0.25;   // fraccion del bote que se quema al bajar apalancamiento
 const VELOCIDAD_POR_APALANCAMIENTO = 0.04; // +4% de velocidad por nivel: x5 -> +16%, x10 -> +36%
 
@@ -1503,7 +1509,7 @@ function calcularGasto(g) {
 
   const cosmicStacks = stacksDe(g, 'cosmic_resonance');
   if (cosmicStacks > 0) {
-    const tiers = Math.floor(tailLen / 10);
+    const tiers = Math.min(RESONANCIA_TRAMOS_MAX, Math.floor(tailLen / 10));
     if (tiers > 0) lengthDrain *= Math.pow(0.85, tiers * cosmicStacks);
   }
 
@@ -1511,6 +1517,9 @@ function calcularGasto(g) {
 
   const compassStacks = stacksDe(g, 'hyperspace_compass');
   if (compassStacks > 0) total *= Math.pow(0.65, compassStacks);
+
+  // El piso proporcional manda: las cartas no bajan de aqui
+  total = Math.max(total, GASTO_PISO_BASE + GASTO_PISO_POR_SEGMENTO * tailLen);
 
   // Apalancamiento: el gasto base sube con la posicion abierta
   total *= 1 + GASTO_POR_APALANCAMIENTO * (g.apalancamiento - 1);
