@@ -416,7 +416,6 @@ function marcadoUI() {
     '      <div class="sr-menu__title">SNAKE COGUE PITE</div>',
     '      <button type="button" class="sr-btn-restart sr-menu__btn" data-act="jugar">' + ico('jugar') + ' ' + T('menu.jugar') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="controles">' + ico('mando') + ' ' + T('menu.controles') + '</button>',
-    '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="ranking">' + ico('trofeo') + ' ' + T('menu.ranking') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="acerca">' + ico('vida') + ' ' + T('menu.acerca') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn sr-menu__idioma" data-act="idioma" data-idioma="' + idioma() + '" title="' + T('menu.idiomaTitulo') + '"><b data-on="es">ES</b><i>·</i><b data-on="en">EN</b></button>',
     '      <div class="sr-menu__record">' + T('menu.record', { pts: 0, cola: 4 }) + '</div>',
@@ -441,12 +440,11 @@ function marcadoUI() {
     '      </dl>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="volver">' + T('menu.volver') + '</button>',
     '    </div>',
-    '    <div class="sr-menu sr-menu--ranking" data-panel="ranking" data-visible="0">',
-    '      <div class="sr-modal-title">' + ico('trofeo') + ' ' + T('rank.titulo') + '</div>',
+    '    <aside class="sr-menu__top">',
+    '      <div class="sr-menu__top-titulo">' + ico('trofeo') + ' ' + T('rank.titulo') + '</div>',
     '      <ol class="sr-ranking"></ol>',
     '      <div class="sr-ranking__estado"></div>',
-    '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="volver">' + T('menu.volver') + '</button>',
-    '    </div>',
+    '    </aside>',
     '    <div class="sr-menu sr-menu--acerca" data-panel="acerca" data-visible="0">',
     '      <div class="sr-modal-title">' + T('acerca.titulo') + '</div>',
     '      <p class="sr-acerca__texto">' + T('acerca.texto') + '</p>',
@@ -474,7 +472,10 @@ function marcadoUI() {
     '    <div class="sr-modal-title">' + T('sel.titulo') + '</div>',
     '    <div class="sr-modal-subtitle">' + T('sel.sub') + '</div>',
     '    <div class="sr-cards-grid sr-cards-grid--mecanicas"></div>',
-    '    <button type="button" class="sr-btn-secundario sr-btn-rebobinar" data-act="rebobinar">' + ico('dados') + ' ' + T('sel.rebobinar') + ' <span class="sr-footer__kbd">R</span></button>',
+    '    <div class="sr-seleccion__botones">',
+    '      <button type="button" class="sr-btn-secundario sr-btn-rebobinar" data-act="menu">' + ico('cerrar') + ' ' + T('sel.atras') + ' <span class="sr-footer__kbd">Esc</span></button>',
+    '      <button type="button" class="sr-btn-secundario sr-btn-rebobinar" data-act="rebobinar">' + ico('dados') + ' ' + T('sel.rebobinar') + ' <span class="sr-footer__kbd">R</span></button>',
+    '    </div>',
     '  </div>',
     '  <div class="sr-overlay sr-modal-summary" data-visible="0">',
     '    <div class="sr-summary-box">',
@@ -570,7 +571,6 @@ function construirUI() {
     menuPrincipal: q('.sr-menu[data-panel="principal"]'),
     menuControles: q('.sr-menu[data-panel="controles"]'),
     menuAcerca: q('.sr-menu[data-panel="acerca"]'),
-    menuRanking: q('.sr-menu[data-panel="ranking"]'),
     rankingLista: q('.sr-ranking'),
     rankingEstado: q('.sr-ranking__estado'),
     formRanking: q('.sr-summary-ranking'),
@@ -1940,6 +1940,7 @@ function mostrarMenu() {
   inst.els.modalLevelup.dataset.visible = '0';
   inst.els.modalMecanica.dataset.visible = '0';
   mostrarPanel('principal');
+  cargarRanking();
   inst.els.menuRecord.textContent = T('menu.record', { pts: records.puntos, cola: records.cola });
   inst.els.modalMenu.dataset.visible = '1';
   updateHUD();
@@ -1950,8 +1951,6 @@ function mostrarPanel(nombre) {
   inst.els.menuPrincipal.dataset.visible = nombre === 'principal' ? '1' : '0';
   inst.els.menuControles.dataset.visible = nombre === 'controles' ? '1' : '0';
   inst.els.menuAcerca.dataset.visible = nombre === 'acerca' ? '1' : '0';
-  inst.els.menuRanking.dataset.visible = nombre === 'ranking' ? '1' : '0';
-  if (nombre === 'ranking') cargarRanking();
 }
 
 // ---- ranking ----------------------------------------------------------------
@@ -2696,8 +2695,6 @@ function onClick(ev) {
     mostrarControles(true);
   } else if (act === 'acerca') {
     mostrarPanel('acerca');
-  } else if (act === 'ranking') {
-    mostrarPanel('ranking');
   } else if (act === 'volver') {
     mostrarControles(false);
   }

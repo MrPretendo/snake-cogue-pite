@@ -831,8 +831,48 @@
 }
 
 /* Ranking */
-.sr-menu--ranking {
-  max-width: 460px;
+.sr-menu__top {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 232px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 10px 8px;
+  border: 1px solid rgba(0, 229, 255, 0.22);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, rgba(0, 229, 255, 0.07), rgba(0, 229, 255, 0.02));
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.14);
+}
+
+.sr-menu__top-titulo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #FFD54F;
+  text-shadow: 0 0 8px rgba(255, 213, 79, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sr-menu__top .sr-ranking { gap: 3px; }
+
+.sr-menu__top .sr-ranking__fila {
+  grid-template-columns: 20px 1fr auto;
+  gap: 6px;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+
+.sr-menu__top .sr-ranking__mec { display: none; }
+
+.sr-seleccion__botones {
+  display: flex;
   gap: 10px;
 }
 
