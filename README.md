@@ -59,7 +59,9 @@ recuperada arde igual de rápido. Al quedar sin cola, mueres.
 Antes de cada run se ofrecen tres cartas: **Clásica** en el centro y, a los
 lados, dos cartas dobles que combinan mecánicas de categorías distintas
 (atención, beneficio, nerf) sorteadas al azar; el bote de una carta doble es el
-producto. **Rebobinar** (R) vuelve a sortear.
+producto de sus dos multiplicadores **×4** (`BONO_NO_CLASICA`): elegir
+cualquier cosa que no sea Clásica cuadruplica la ganancia, encima de lo que
+sumen las mecánicas. **Rebobinar** (R) vuelve a sortear.
 
 | Mecánica | Regla | Bote |
 |---|---|---|

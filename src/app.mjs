@@ -178,6 +178,8 @@ const BARRIDO_TIRON = 1.6;       // casillas por tick
 const BARRIDO_EXTRA_MAX = 8;     // frutas nuevas como mucho al duplicar
 const ARTEFACTO_TIPOS = Object.freeze(['portal', 'impulso', 'barrido', 'euforia']);
 
+const BONO_NO_CLASICA = 4;       // x4 a puntos y bote por jugar con cualquier mecanica
+
 const MURO_CADENCIA = 6;        // s entre saltos del muro libre (Muro Errante)
 const MURO_AVISO = 1.2;         // s de aviso antes del salto
 const MUROS = Object.freeze(['arriba', 'derecha', 'abajo', 'izquierda']);
@@ -201,6 +203,9 @@ function fusionarMecanicas(lista) {
       if (m[k]) r[k] = m[k];
     }
   }
+  // Elegir cualquier carta que no sea Clasica multiplica la ganancia x4 encima
+  // del producto de sus dos mecanicas: es lo que compensa el riesgo.
+  if (lista.length) r.mult *= BONO_NO_CLASICA;
   r.mult = Math.round(r.mult * 100) / 100;
   return r;
 }
