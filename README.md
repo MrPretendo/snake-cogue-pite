@@ -1,7 +1,7 @@
 # Snake Cogue Pite
 
-Un snake roguelite de apuesta con estética holográfica. Puramente web: HTML,
-CSS, JavaScript y Canvas 2D, sin dependencias ni build. Español e inglés.
+Un roguelite holográfico de Snake. Puramente web: HTML,
+CSS, JavaScript y Canvas 2D, sin dependencias ni build. Inglés por defecto, español con L.
 
 **Jugar:** <https://claude.ai/code/artifact/570049cd-8950-4f1c-bafc-f7ad1c1523c8>
 

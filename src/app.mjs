@@ -73,9 +73,9 @@ const COLA_MINIMA = 2;                  // por debajo, muerte
 const JACKPOT_FRUTAS = 3;
 const BUFF_DURACION = 9;           // s de cada mejora temporal
 const TRAGAPERRAS_SIMBOLOS = Object.freeze([
-  { id: 'escudo', icon: 'escudo', name: 'INVENCIBLE', desc: 'nada te mata y la cola se cruza gratis' },
+  { id: 'escudo', icon: 'escudo', name: 'INVENCIBLE', desc: 'inmune; la cola se cruza gratis' },
   { id: 'energia', icon: 'rayo', name: 'SIN GASTO', desc: 'la energía no baja' },
-  { id: 'iman', icon: 'iman', name: 'IMÁN TOTAL', desc: 'atraes todas las frutas de la arena' },
+  { id: 'iman', icon: 'iman', name: 'IMÁN TOTAL', desc: 'atrae todas las frutas de la arena' },
   { id: 'bote', icon: 'monedas', name: 'BOTE DOBLE', desc: 'todo lo que entra al bote ×2' },
   { id: 'lento', icon: 'tortuga', name: 'CÁMARA LENTA', desc: 'media velocidad, medio gasto' }
 ]);
@@ -121,7 +121,7 @@ const MECANICAS = Object.freeze([
   {
     id: 'cola', cat: 'atencion', icon: 'prohibido', name: 'Cola Intocable', mult: 3, colaIntocable: true, eje: 'salto',
     excluye: ['phantom_vault', 'elastic_body'],
-    desc: 'Tocar tu cola es el fin.'
+    desc: 'Tocar la cola es el fin.'
   },
   {
     id: 'fugaces', cat: 'atencion', icon: 'reloj', name: 'Frutas Fugaces', mult: 1.5, frutasFugaces: 7,
