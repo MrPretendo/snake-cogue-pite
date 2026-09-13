@@ -47,7 +47,8 @@ mutación, y se acumulan.
 El gasto tiene un **piso proporcional a la cola** que ninguna carta rebaja
 (`1 + 0.025·cola` por segundo: cola 100 → 3.5, cola 500 → 13.5); las cartas
 sólo pueden bajar la fórmula hasta ahí, y Resonancia mitiga como mucho 5
-tramos. Apalancamiento, bajón y la mecánica de la run multiplican después.
+tramos. Las tres cartas que reducen el gasto (Criogénico, Brújula, Resonancia)
+van un 15 % más fuertes que en el original. Apalancamiento, bajón y la mecánica de la run multiplican después.
 
 **Sin energía, la cola se quema**: tras 0.75 s de aviso arde a `colaMáxima ÷ 3`
 segmentos por segundo (mínimo 2/s), y esa velocidad no baja nunca — una cola
@@ -62,8 +63,8 @@ producto. **Rebobinar** (R) vuelve a sortear.
 
 | Mecánica | Regla | Bote |
 |---|---|---|
-| Muro Errante | Tres muros matan; el cuarto envuelve y salta de sitio cada 6 s | ×2 |
-| Cola Intocable | Tocar tu cola es el fin | ×2 |
+| Muro Errante | Tres muros matan; el cuarto envuelve y salta de sitio cada 6 s | ×3 |
+| Cola Intocable | Tocar tu cola es el fin | ×3 |
 | Frutas Fugaces | Las frutas caducan a los 7 s y rompen la racha | ×1.5 |
 | Turbo Gratis | El dash no gasta energía | ×0.8 |
 | Metabolismo Lento | Gastas un 40 % menos | ×0.8 |
@@ -71,6 +72,16 @@ producto. **Rebobinar** (R) vuelve a sortear.
 | Salto Caro | Cruzar la cola cuesta el doble | ×1.5 |
 | Metabolismo Doble | Gastas el doble | ×1.75 |
 | Bote Volátil | No se puede cobrar: sólo paga el jackpot | ×2 |
+
+### Artefactos
+
+Aparecen en una casilla libre cada 18–30 s, duran 15 s (anillo de cuenta
+atrás, parpadeo al final) y se recogen pasando la cabeza por encima:
+
+- **Portal**: dos extremos unidos por un hilo; entrar por uno saca por el otro.
+- **Impulso**: 5 s de velocidad extra (+70 % que va bajando) **sin gasto**.
+- **Barrido**: tira de todas las frutas hacia ti durante 1.2 s y las duplica.
+- **Euforia**: frenesí al instante (o lo alarga si ya estaba activo).
 
 ### La apuesta
 

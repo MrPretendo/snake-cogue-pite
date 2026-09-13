@@ -178,6 +178,59 @@ export function dibujarGlitch(c, canvas, intensidad) {
   c.restore();
 }
 
+// ---- artefactos -----------------------------------------------------------------
+
+// Glifo vectorial por tipo, halo aditivo y anillo de vida que se consume.
+export function dibujarArtefacto(c, a, t, tiempo, color, vida) {
+  const cx = (a.x + 0.5) * t;
+  const cy = (a.y + 0.5) * t;
+  const r = t * 0.42;
+  const parpadeo = vida < 0.25 && Math.floor(tiempo * 8) % 2 === 0;
+  c.save();
+  c.translate(cx, cy);
+  c.globalAlpha = parpadeo ? 0.45 : 1;
+  // halo
+  c.globalCompositeOperation = 'lighter';
+  const halo = c.createRadialGradient(0, 0, r * 0.2, 0, 0, r + 8);
+  halo.addColorStop(0, color);
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = halo;
+  c.globalAlpha *= 0.3;
+  c.beginPath(); c.arc(0, 0, r + 8, 0, Math.PI * 2); c.fill();
+  c.globalAlpha = parpadeo ? 0.45 : 1;
+  c.globalCompositeOperation = 'source-over';
+  // anillo de vida
+  c.strokeStyle = color; c.lineWidth = 2;
+  c.beginPath(); c.arc(0, 0, r + 3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * vida); c.stroke();
+  // glifo
+  c.lineWidth = 2; c.lineCap = 'round'; c.lineJoin = 'round';
+  if (a.tipo === 'portal') {
+    c.rotate(tiempo * 2.5);
+    for (let i = 0; i < 2; i++) {
+      c.beginPath(); c.arc(0, 0, r * (0.75 - i * 0.3), i * Math.PI, i * Math.PI + Math.PI * 1.4); c.stroke();
+    }
+  } else if (a.tipo === 'impulso') {
+    const d = ((tiempo * 1.5) % 1) * r * 0.5 - r * 0.25;
+    for (let i = -1; i <= 1; i++) {
+      c.beginPath(); c.moveTo(-r * 0.35 + i * r * 0.3 + d, -r * 0.45); c.lineTo(r * 0.05 + i * r * 0.3 + d, 0); c.lineTo(-r * 0.35 + i * r * 0.3 + d, r * 0.45); c.stroke();
+    }
+  } else if (a.tipo === 'barrido') {
+    c.rotate(Math.sin(tiempo * 3) * 0.3);
+    c.lineWidth = 3;
+    c.beginPath(); c.arc(0, r * 0.1, r * 0.55, Math.PI, Math.PI * 2); c.stroke();
+    c.beginPath(); c.moveTo(-r * 0.55, r * 0.1); c.lineTo(-r * 0.55, r * 0.5); c.moveTo(r * 0.55, r * 0.1); c.lineTo(r * 0.55, r * 0.5); c.stroke();
+  } else {
+    c.rotate(tiempo * 1.2);
+    c.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2; const rr = i % 2 ? r * 0.35 : r * 0.8;
+      c.lineTo(Math.cos(ang) * rr, Math.sin(ang) * rr);
+    }
+    c.closePath(); c.stroke();
+  }
+  c.restore();
+}
+
 // ---- rastro de la cabeza --------------------------------------------------------
 
 export function registrarRastro(g, x, y) {

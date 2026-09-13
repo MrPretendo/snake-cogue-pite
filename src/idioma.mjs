@@ -98,7 +98,9 @@ const ES = {
   'f.buff': '{n} · {s}s', 'f.frenesi': '¡¡FRENESÍ!!', 'f.frenesiSub': 'MEDIO GASTO · +30% VELOCIDAD · BOTE x2', 'f.frenesiFinResaca': 'FIN DEL FRENESÍ · SIN RESACA',
   'f.bajon': 'BAJÓN: GASTO x{g} DURANTE {s}s', 'f.mutacion': '¡MUTACIÓN ASIMILADA!', 'f.degen': '¡MODO DEGEN! APALANCAMIENTO x{n} EN LA TECLA 5',
   'f.sinResaca': '¡SIN RESACA!', 'f.bateria': '¡BATERÍA NIVEL {n}! (MÁX: {m})', 'f.frutas': '¡FRUTAS MÚLTIPLES NIVEL {n}! (Total: {t} frutas)',
-  'f.fantasma': '¡SALTOS FANTASMA +3! (TOTAL: {n})', 'f.hito': 'RACHA {n}'
+  'f.fantasma': '¡SALTOS FANTASMA +3! (TOTAL: {n})', 'f.hito': 'RACHA {n}',
+  'f.portal': '¡PORTAL!', 'f.impulso': '¡IMPULSO! {s}s SIN GASTO', 'f.barrido': '¡BARRIDO! +{n} FRUTAS', 'f.artefactoEuforia': '¡EUFORIA!',
+  'ctl.artefactos': 'Artefactos', 'ctl.artefactosD': 'Aparecen en la arena y duran 15 s: portal (A ↔ B), impulso (5 s de velocidad sin gasto), barrido (tira de las frutas y las duplica) y euforia (frenesí al instante).'
 };
 
 const EN = {
@@ -155,18 +157,20 @@ const EN = {
   'f.bajon': 'CRASH: DRAIN x{g} FOR {s}s', 'f.mutacion': 'MUTATION ASSIMILATED!', 'f.degen': 'DEGEN MODE! LEVERAGE x{n} ON KEY 5',
   'f.sinResaca': 'NO HANGOVER!', 'f.bateria': 'BATTERY LEVEL {n}! (MAX: {m})', 'f.frutas': 'MULTI-FRUIT LEVEL {n}! (Total: {t} fruits)',
   'f.fantasma': 'PHANTOM JUMPS +3! (TOTAL: {n})', 'f.hito': 'STREAK {n}',
+  'f.portal': 'PORTAL!', 'f.impulso': 'BOOST! {s}s NO DRAIN', 'f.barrido': 'SWEEP! +{n} FRUITS', 'f.artefactoEuforia': 'EUPHORIA!',
+  'ctl.artefactos': 'Artifacts', 'ctl.artefactosD': 'Appear on the arena for 15 s: portal (A ↔ B), boost (5 s of speed with no drain), sweep (pulls every fruit and doubles them) and euphoria (instant frenzy).',
 
   // catálogos (en español viven en app.mjs)
-  'perk.cryo_metabolism.name': 'Cryo Metabolism', 'perk.cryo_metabolism.desc': 'Cuts length drain with diminishing returns (-30% at level 1, down to 15% per level).', 'perk.cryo_metabolism.badge': 'Passive',
+  'perk.cryo_metabolism.name': 'Cryo Metabolism', 'perk.cryo_metabolism.desc': 'Cuts length drain with diminishing returns (-34% at level 1, down to 17% per level).', 'perk.cryo_metabolism.badge': 'Passive',
   'perk.phantom_vault.name': 'Phantom Jump', 'perk.phantom_vault.desc': 'Tail jump costs only 4 energy and grants +3 free quantum jumps per level.', 'perk.phantom_vault.badge': 'Mobility',
   'perk.quantum_magnet.name': 'Quantum Magnet', 'perk.quantum_magnet.desc': 'Pulls fruits from 2 tiles; +1 tile per level, up to 7.', 'perk.quantum_magnet.badge': 'Utility',
   'perk.twin_fruits.name': 'Multi-Fruit', 'perk.twin_fruits.desc': 'Keeps 3 fruits on the arena (+2 per extra level), dense hunting grounds.', 'perk.twin_fruits.badge': 'Arena',
   'perk.turbo_efficient.name': 'Overcharged Dash', 'perk.turbo_efficient.desc': 'Turbo uses 80% less energy and adds +25% speed.', 'perk.turbo_efficient.badge': 'Turbo',
   'perk.battery_upgrade.name': 'Nuclear Battery', 'perk.battery_upgrade.desc': 'Max energy +50 (stacks) and fruits restore +18 extra energy per level.', 'perk.battery_upgrade.badge': 'Energy',
-  'perk.hyperspace_compass.name': 'Hyperspace Sensor', 'perk.hyperspace_compass.desc': 'Holographic guide with +35% speed toward fruit and 35% less metabolic drain.', 'perk.hyperspace_compass.badge': 'Navigation',
+  'perk.hyperspace_compass.name': 'Hyperspace Sensor', 'perk.hyperspace_compass.desc': 'Holographic guide with +35% speed toward fruit and 40% less metabolic drain.', 'perk.hyperspace_compass.badge': 'Navigation',
   'perk.elastic_body.name': 'Elastic Body', 'perk.elastic_body.desc': 'Guaranteed +15 energy back on every tail jump.', 'perk.elastic_body.badge': 'Survival',
   'perk.dense_nutrition.name': 'Dense Nutrition', 'perk.dense_nutrition.desc': 'Double XP from all fruits, +12 energy per level, and every fruit grows the tail one extra segment per level.', 'perk.dense_nutrition.badge': 'Growth',
-  'perk.cosmic_resonance.name': 'Ouroboros Resonance', 'perk.cosmic_resonance.desc': 'Every 10 tail tiles: +12% speed and 15% less length drain.', 'perk.cosmic_resonance.badge': 'Legendary',
+  'perk.cosmic_resonance.name': 'Ouroboros Resonance', 'perk.cosmic_resonance.desc': 'Every 10 tail tiles: +12% speed and 17% less length drain.', 'perk.cosmic_resonance.badge': 'Legendary',
   'perk.manos_diamante.name': 'Diamond Hands', 'perk.manos_diamante.desc': 'On death the pot is not lost: cashed at 50% (+25% per level, up to 100%).', 'perk.manos_diamante.badge': 'Bet',
   'perk.martingala.name': 'Martingale', 'perk.martingala.desc': 'After a spin with no pair, the next one guarantees a pair.', 'perk.martingala.badge': 'Bet',
   'perk.sin_resaca.name': 'No Hangover', 'perk.sin_resaca.desc': 'Removes the crash after frenzy. Each extra level adds +2 s of frenzy.', 'perk.sin_resaca.badge': 'Frenzy',

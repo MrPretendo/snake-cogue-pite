@@ -115,11 +115,11 @@ const CATEGORIAS = Object.freeze({
 const MECANICAS = Object.freeze([
   // -- atencion: obligan a mirar
   {
-    id: 'muro_errante', cat: 'atencion', icon: 'muro', name: 'Muro Errante', mult: 2, muroErrante: true,
+    id: 'muro_errante', cat: 'atencion', icon: 'muro', name: 'Muro Errante', mult: 3, muroErrante: true,
     desc: 'Tres muros matan. El libre cambia de sitio.'
   },
   {
-    id: 'cola', cat: 'atencion', icon: 'prohibido', name: 'Cola Intocable', mult: 2, colaIntocable: true, eje: 'salto',
+    id: 'cola', cat: 'atencion', icon: 'prohibido', name: 'Cola Intocable', mult: 3, colaIntocable: true, eje: 'salto',
     excluye: ['phantom_vault', 'elastic_body'],
     desc: 'Tocar tu cola es el fin.'
   },
@@ -161,6 +161,22 @@ const MECANICAS_RESERVA = Object.freeze([
   { id: 'velocidad', cat: 'nerf', icon: 'velocimetro', name: 'Velocidad Triple', mult: 2.5, velocidad: 3, desc: 'La serpiente avanza al triple de velocidad base.' },
   { id: 'apalancada', cat: 'nerf', icon: 'subida', name: 'Todo Apalancado', mult: 1.25, apalancamientoMin: 5, desc: 'Empiezas a ×5 y no puedes bajar.' }
 ]);
+
+// ---- artefactos -------------------------------------------------------------
+// Objetos temporales en la arena: aparecen cada 18-30 s, duran 15 s y se
+// recogen pasando la cabeza por encima. Portal (A<->B), impulso (5 s de
+// velocidad sin gasto, decreciente), barrido (tira de todas las frutas y las
+// duplica) y euforia (frenesí inmediato).
+const ARTEFACTO_CADENCIA_MIN = 18;
+const ARTEFACTO_CADENCIA_MAX = 30;
+const ARTEFACTO_VIDA = 15;
+const ARTEFACTO_DIST_MIN = 6;
+const IMPULSO_DURACION = 5;
+const IMPULSO_VELOCIDAD = 0.7;   // hasta +70% al empezar, bajando a 0
+const BARRIDO_DURACION = 1.2;
+const BARRIDO_TIRON = 1.6;       // casillas por tick
+const BARRIDO_EXTRA_MAX = 8;     // frutas nuevas como mucho al duplicar
+const ARTEFACTO_TIPOS = Object.freeze(['portal', 'impulso', 'barrido', 'euforia']);
 
 const MURO_CADENCIA = 6;        // s entre saltos del muro libre (Muro Errante)
 const MURO_AVISO = 1.2;         // s de aviso antes del salto
@@ -250,7 +266,8 @@ function getCryoMultiplier(stacks) {
   let mult = 1.0;
   for (let k = 1; k <= stacks; k++) {
     // La efectividad va bajando progresivamente hasta proporcionar solo un 15%
-    const eff = Math.max(0.15, 0.15 + 0.15 / k);
+    // (+15% sobre lo original: -34.5% al nivel 1)
+    const eff = Math.max(0.15, 0.15 + 0.15 / k) * 1.15;
     mult *= (1.0 - eff);
   }
   return mult;
@@ -266,7 +283,7 @@ const PERK_CATALOG = [
     id: 'cryo_metabolism',
     icon: 'cryo',
     name: 'Metabolismo Criogénico',
-    desc: 'Reduce el drenaje por longitud con efectividad decreciente (-30% nivel 1, bajando hasta aportar 15% por nivel).',
+    desc: 'Reduce el drenaje por longitud con efectividad decreciente (-34% nivel 1, bajando hasta aportar 17% por nivel).',
     badge: 'Pasivo'
   },
   {
@@ -308,7 +325,7 @@ const PERK_CATALOG = [
     id: 'hyperspace_compass',
     icon: 'brujula',
     name: 'Sensor Hiperespacial',
-    desc: 'Guía holográfica con +35% velocidad hacia la fruta y reduce el drenaje metabólico un 35%.',
+    desc: 'Guía holográfica con +35% velocidad hacia la fruta y reduce el drenaje metabólico un 40%.',
     badge: 'Navegación'
   },
   {
@@ -329,7 +346,7 @@ const PERK_CATALOG = [
     id: 'cosmic_resonance',
     icon: 'orbita',
     name: 'Resonancia Ouroboros',
-    desc: 'Cada 10 casillas de cola, tu velocidad aumenta +12% y el drenaje por longitud se mitiga un 15%.',
+    desc: 'Cada 10 casillas de cola, tu velocidad aumenta +12% y el drenaje por longitud se mitiga un 17%.',
     badge: 'Legendario'
   },
   {
@@ -433,6 +450,7 @@ function marcadoUI() {
     '        <dt><span class="sr-footer__kbd">' + T('ctl.espacio') + '</span> / <span class="sr-footer__kbd">Shift</span></dt><dd>' + T('ctl.dash') + '</dd>',
     '        <dt>' + T('ctl.cola') + '</dt><dd>' + T('ctl.colaD') + '</dd>',
     '        <dt>' + T('ctl.sinEnergia') + '</dt><dd>' + T('ctl.sinEnergiaD') + '</dd>',
+    '        <dt>' + T('ctl.artefactos') + '</dt><dd>' + T('ctl.artefactosD') + '</dd>',
     '      </dl>',
     '      <div class="sr-modal-title sr-modal-title--menor">' + T('ctl.apuesta') + '</div>',
     '      <dl class="sr-controles sr-controles--apuesta">',
@@ -721,6 +739,11 @@ function initGame(listaMecanicas = []) {
     inanicionAcum: 0,      // fraccion de segmento pendiente de quemar
     inanicionPerdidos: 0,  // segmentos quemados en este episodio
     inanicionLatido: 0,    // ultimo intervalo en que sono el latido
+    artefactos: [],
+    artefactoTimer: ARTEFACTO_CADENCIA_MIN,
+    impulso: 0,            // s de impulso de velocidad restantes
+    barrido: 0,            // s de barrido magnetico restantes
+    artefactosRecogidos: 0,
     level: 1,
     xp: 0,
     xpNext: calculateXpNext(1),
@@ -876,6 +899,7 @@ function spawnFruit(forcedType = null) {
   for (const f of g.fruits) {
     occupied.add(`${Math.round(f.x)},${Math.round(f.y)}`);
   }
+  for (const a of g.artefactos) occupied.add(`${a.x},${a.y}`);
 
   const farCandidates = [];
   const allFreeCandidates = [];
@@ -971,7 +995,7 @@ function gameTick() {
     // El frenesí suspende el gasto entero, turbo incluido
     // El paro del metabolismo es EXCLUSIVO de la tragaperras (buff Sin Gasto);
     // el frenesí solo lo reduce a la mitad.
-    if (g.buff === 'energia') totalDrain = 0;
+    if (g.buff === 'energia' || g.impulso > 0) totalDrain = 0;
     else if (g.frenesiActiva) totalDrain *= 0.5;
     if (g.buff === 'lento') totalDrain *= 0.5;
 
@@ -1066,6 +1090,39 @@ function gameTick() {
       }
     }
 
+    // 1c-0. Artefactos: aparecen, caducan; impulso y barrido corren
+    g.artefactoTimer -= dt;
+    if (g.artefactoTimer <= 0) {
+      spawnArtefacto();
+      g.artefactoTimer = ARTEFACTO_CADENCIA_MIN + Math.random() * (ARTEFACTO_CADENCIA_MAX - ARTEFACTO_CADENCIA_MIN);
+    }
+    for (let i = g.artefactos.length - 1; i >= 0; i--) {
+      const a = g.artefactos[i];
+      a.vida -= dt;
+      if (a.vida <= 0) {
+        g.artefactos.splice(i, 1);
+        spawnParticleBurst((a.x + 0.5) * g.tile, (a.y + 0.5) * g.tile, colorArtefacto(a.tipo), 8);
+      }
+    }
+    if (g.impulso > 0) g.impulso = Math.max(0, g.impulso - dt);
+    if (g.barrido > 0) {
+      g.barrido = Math.max(0, g.barrido - dt);
+      const head = g.snake[0];
+      for (let i = g.fruits.length - 1; i >= 0; i--) {
+        const f = g.fruits[i];
+        const d = Math.hypot(head.x - f.x, head.y - f.y);
+        if (d <= 1.3) {
+          const fruit = g.fruits.splice(i, 1)[0];
+          onEatFruit(fruit, true);
+          if (g.state !== 'playing') break;
+          continue;
+        }
+        const paso = Math.min(d, BARRIDO_TIRON);
+        f.x += ((head.x - f.x) / d) * paso;
+        f.y += ((head.y - f.y) / d) * paso;
+      }
+    }
+
     // 1c. Mecanicas de atencion: el muro que salta y las frutas que caducan
     if (g.mecanica.muroErrante) {
       const antes = g.muroTimer;
@@ -1122,6 +1179,7 @@ function gameTick() {
     // El apalancamiento tambien acelera un poco: mas riesgo, mas ritmo
     currentStepInt /= 1 + VELOCIDAD_POR_APALANCAMIENTO * (g.apalancamiento - 1);
     if (g.buff === 'lento') currentStepInt *= 1.5;
+    if (g.impulso > 0) currentStepInt /= 1 + IMPULSO_VELOCIDAD * (g.impulso / IMPULSO_DURACION);
     if (g.frenesiActiva) currentStepInt *= 0.77;      // +30% en frenesí
     else if (g.bajonTimer > 0) currentStepInt *= 1.1;  // -10% en el bajon
     g.stepInterval = currentStepInt;
@@ -1328,6 +1386,7 @@ function stepSnake() {
     jump: jumped ? 1.0 : 0
   });
   fx.registrarRastro(g, nextX, nextY);
+  recogerArtefacto(nextX, nextY);
   if (jumped) {
     sfx.tocar('salto');
     fx.onda(g, (nextX + 0.5) * g.tile, (nextY + 0.5) * g.tile, { maxR: 46, dur: 0.3, color: fx.CIAN, grosor: 2 });
@@ -1488,6 +1547,98 @@ function onEatFruit(fruit, porIman = false) {
   rellenarFrutas(targetCount);
 }
 
+// ---- artefactos -------------------------------------------------------------
+
+function colorArtefacto(tipo) {
+  return tipo === 'portal' ? fx.VIOLETA : tipo === 'impulso' ? fx.CIAN : tipo === 'barrido' ? fx.ORO : fx.MAGENTA;
+}
+
+function celdaLibreLejana(g, minDist) {
+  const head = g.snake[0];
+  const ocupadas = new Set();
+  for (const s of g.snake) ocupadas.add(`${s.x},${s.y}`);
+  for (const f of g.fruits) ocupadas.add(`${Math.round(f.x)},${Math.round(f.y)}`);
+  for (const a of g.artefactos) ocupadas.add(`${a.x},${a.y}`);
+  const candidatas = [];
+  for (let x = 1; x < g.gridCols - 1; x++) {
+    for (let y = 1; y < g.gridRows - 1; y++) {
+      if (ocupadas.has(`${x},${y}`)) continue;
+      if (Math.hypot(x - head.x, y - head.y) < minDist) continue;
+      candidatas.push({ x, y });
+    }
+  }
+  return candidatas.length ? candidatas[Math.floor(Math.random() * candidatas.length)] : null;
+}
+
+function spawnArtefacto() {
+  const g = inst.game;
+  if (!g || g.artefactos.length >= 3) return;
+  const tipo = ARTEFACTO_TIPOS[Math.floor(Math.random() * ARTEFACTO_TIPOS.length)];
+  const a = celdaLibreLejana(g, ARTEFACTO_DIST_MIN);
+  if (!a) return;
+  const art = { tipo, x: a.x, y: a.y, vida: ARTEFACTO_VIDA, par: null };
+  g.artefactos.push(art);
+  if (tipo === 'portal') {
+    const b = celdaLibreLejana(g, ARTEFACTO_DIST_MIN);
+    if (!b) { g.artefactos.pop(); return; }
+    const salida = { tipo, x: b.x, y: b.y, vida: ARTEFACTO_VIDA, par: art };
+    art.par = salida;
+    g.artefactos.push(salida);
+  }
+  sfx.tocar('artefacto');
+  fx.onda(g, (a.x + 0.5) * g.tile, (a.y + 0.5) * g.tile, { maxR: 60, dur: 0.5, color: colorArtefacto(tipo), grosor: 2 });
+}
+
+function recogerArtefacto(x, y) {
+  const g = inst.game;
+  const i = g.artefactos.findIndex((a) => a.x === x && a.y === y);
+  if (i === -1) return;
+  const a = g.artefactos[i];
+  const px = (x + 0.5) * g.tile;
+  const py = (y + 0.5) * g.tile;
+  g.artefactosRecogidos++;
+
+  if (a.tipo === 'portal') {
+    // Entrar por un extremo saca por el otro; el par sigue vivo para volver
+    const otro = a.par;
+    if (otro) {
+      g.snake[0].x = otro.x;
+      g.snake[0].y = otro.y;
+      fx.registrarRastro(g, otro.x, otro.y);
+      fx.onda(g, px, py, { maxR: 90, dur: 0.4, color: fx.VIOLETA, grosor: 3 });
+      fx.onda(g, (otro.x + 0.5) * g.tile, (otro.y + 0.5) * g.tile, { maxR: 120, dur: 0.5, color: fx.VIOLETA, grosor: 3 });
+      fx.flash(g, fx.VIOLETA, 0.2, 0.3);
+      sfx.tocar('portal');
+      addFloater(T('f.portal'), (otro.x + 0.5) * g.tile, (otro.y + 0.5) * g.tile - 26, fx.VIOLETA, { tam: 14, glow: 12 });
+    }
+    return;
+  }
+
+  g.artefactos.splice(i, 1);
+  spawnParticleBurst(px, py, colorArtefacto(a.tipo), 28);
+  fx.onda(g, px, py, { maxR: 160, dur: 0.5, color: colorArtefacto(a.tipo), grosor: 4 });
+  sfx.tocar('artefactoRecogido');
+
+  if (a.tipo === 'impulso') {
+    g.impulso = IMPULSO_DURACION;
+    addFloater(T('f.impulso', { s: IMPULSO_DURACION }), px, py - 26, fx.CIAN, { tam: 15, glow: 12 });
+  } else if (a.tipo === 'barrido') {
+    g.barrido = BARRIDO_DURACION;
+    // Duplicar: por cada fruta, otra cerca (sin pasar de la arena)
+    const extra = Math.min(BARRIDO_EXTRA_MAX, g.fruits.length);
+    for (let k = 0; k < extra; k++) {
+      const f = g.fruits[k];
+      const c = celdaLibreLejana(g, 0);
+      if (c) g.fruits.push({ x: c.x, y: c.y, type: f.type === 'mutant' ? 'normal' : f.type, pulse: 0, birthTime: g.runTime });
+    }
+    addFloater(T('f.barrido', { n: extra }), px, py - 26, fx.ORO, { tam: 15, glow: 12 });
+  } else if (a.tipo === 'euforia') {
+    addFloater(T('f.artefactoEuforia'), px, py - 26, fx.MAGENTA, { tam: 15, glow: 12 });
+    if (!g.frenesiActiva) { g.frenesi = 1; iniciarFrenesi(); }
+    else g.frenesiTimer += FRENESI_DURACION * 0.5;
+  }
+}
+
 // ---- bucle de apuesta: racha, bote, apalancamiento, jackpot, frenesi --------
 
 function stacksDe(g, perkId) {
@@ -1510,13 +1661,13 @@ function calcularGasto(g) {
   const cosmicStacks = stacksDe(g, 'cosmic_resonance');
   if (cosmicStacks > 0) {
     const tiers = Math.min(RESONANCIA_TRAMOS_MAX, Math.floor(tailLen / 10));
-    if (tiers > 0) lengthDrain *= Math.pow(0.85, tiers * cosmicStacks);
+    if (tiers > 0) lengthDrain *= Math.pow(1 - 0.15 * 1.15, tiers * cosmicStacks); // -17.25% por tramo
   }
 
   let total = 2.2 + lengthDrain;
 
   const compassStacks = stacksDe(g, 'hyperspace_compass');
-  if (compassStacks > 0) total *= Math.pow(0.65, compassStacks);
+  if (compassStacks > 0) total *= Math.pow(1 - 0.35 * 1.15, compassStacks); // -40.25% por nivel
 
   // El piso proporcional manda: las cartas no bajan de aqui
   total = Math.max(total, GASTO_PISO_BASE + GASTO_PISO_POR_SEGMENTO * tailLen);
@@ -2291,6 +2442,24 @@ function render() {
       c.restore();
     }
   }
+
+  // 4b. Artefactos: glifo por tipo, anillo de cuenta atras, portal con su hilo
+  for (const a of g.artefactos) {
+    if (a.tipo === 'portal' && a.par && a.par.x > a.x) continue; // el hilo se dibuja una vez
+    if (a.tipo === 'portal' && a.par) {
+      c.save();
+      c.strokeStyle = 'rgba(224, 64, 251, 0.35)';
+      c.setLineDash([3, 7]);
+      c.lineDashOffset = -tiempo * 30;
+      c.lineWidth = 1.5;
+      c.beginPath();
+      c.moveTo((a.x + 0.5) * t, (a.y + 0.5) * t);
+      c.lineTo((a.par.x + 0.5) * t, (a.par.y + 0.5) * t);
+      c.stroke();
+      c.restore();
+    }
+  }
+  for (const a of g.artefactos) fx.dibujarArtefacto(c, a, t, tiempo, colorArtefacto(a.tipo), a.vida / ARTEFACTO_VIDA);
 
   // 5-6. Rastro, cuerpo y cabeza de la serpiente
   fx.dibujarRastro(c, g, t, hue);

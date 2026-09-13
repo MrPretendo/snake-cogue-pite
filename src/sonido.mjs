@@ -229,6 +229,18 @@ const RECETAS = {
     tono({ tipo: 'sine', freq: f0 * 1.1, freqFin: f0 * 0.6, dur: 0.1, gain: 0.26 + urgencia * 0.15, t0: 0.14 });
     if (urgencia > 0.6) ruido({ dur: 0.05, gain: 0.06, filtro: 'highpass', freq: 4000 });
   },
+  artefacto() {
+    [0, 7, 12].forEach((s, i) => tono({ tipo: 'sine', freq: NOTA(s, 1046), dur: 0.2, gain: 0.1, t0: i * 0.06 }));
+  },
+  artefactoRecogido() {
+    [0, 4, 7, 12, 16].forEach((s, i) => tono({ tipo: 'triangle', freq: NOTA(s, 784), dur: 0.22, gain: 0.12, t0: i * 0.04 }));
+    ruido({ dur: 0.35, gain: 0.07, filtro: 'highpass', freq: 5000, freqFin: 9000 });
+  },
+  portal() {
+    ruido({ dur: 0.35, gain: 0.16, filtro: 'bandpass', freq: 2500, freqFin: 250, q: 1.5 });
+    tono({ tipo: 'sine', freq: 900, freqFin: 200, dur: 0.3, gain: 0.14 });
+    tono({ tipo: 'sine', freq: 200, freqFin: 900, dur: 0.3, gain: 0.12, t0: 0.15 });
+  },
   hambre() {
     tono({ tipo: 'sawtooth', freq: 180, freqFin: 90, dur: 0.18, gain: 0.12 });
     ruido({ dur: 0.1, gain: 0.08, filtro: 'lowpass', freq: 800 });
