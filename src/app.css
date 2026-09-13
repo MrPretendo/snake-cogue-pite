@@ -823,6 +823,13 @@
   text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
 }
 
+.sr-acerca__creditos {
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  color: #64748B;
+}
+
 .sr-acerca__patreon {
   text-decoration: none;
   display: inline-flex;

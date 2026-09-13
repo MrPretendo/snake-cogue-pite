@@ -435,6 +435,7 @@ function marcadoUI() {
     '      <div class="sr-modal-title">' + T('acerca.titulo') + '</div>',
     '      <p class="sr-acerca__texto">' + T('acerca.texto') + '</p>',
     '      <p class="sr-acerca__texto sr-acerca__texto--menor">' + T('acerca.texto2', { link: '<a class="sr-acerca__enlace" href="' + ENLACE_GITHUB + '" target="_blank" rel="noopener">github.com/MrPretendo/snake-cogue-pite</a>' }) + '</p>',
+    '      <p class="sr-acerca__texto sr-acerca__creditos">' + T('acerca.creditos') + '</p>',
     '      <a class="sr-btn-restart sr-menu__btn sr-acerca__patreon" href="' + ENLACE_PATREON + '" target="_blank" rel="noopener">' + ico('vida') + ' ' + T('acerca.patreon') + '</a>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="volver">' + T('menu.volver') + '</button>',
     '    </div>',

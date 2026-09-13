@@ -51,6 +51,7 @@ const ES = {
   'acerca.texto': "Este es un minijuego que vibecodeé para mi proyecto 'SCP: The Black Silk Road', que incluirá este minijuego. Es un extra, pero se me hizo divertido, así que lo estoy publicando para tener un poco más de actividad mientras sigo desarrollando mi proyecto principal. Apóyame en mi Patreon, ¡y gracias por jugar!",
   'acerca.texto2': "Ya que el juego es vibecodeado y que es simplemente un minijuego para mi proyecto, no tengo problemas si quieres modificar, extraer, reempaquetar o continuar con el minijuego; solo te solicito la auditoría apropiada. El código lo puedes encontrar aquí: {link}",
   'acerca.patreon': 'Apóyame en Patreon',
+  'acerca.creditos': 'Código bajo licencia MIT · Música compuesta por MrPretendo con Strudel · Iconos de Lucide (ISC)',
   'patreon.holo': 'Gracias por jugar, visita mi página para saber más sobre mi proyecto SCP The Black Silk Road',
   // controles
   'ctl.titulo': 'CONTROLES', 'ctl.mover': 'Mover', 'ctl.flechas': 'Flechas', 'ctl.dash': 'Dash turbo', 'ctl.espacio': 'ESPACIO',
@@ -110,6 +111,7 @@ const EN = {
   'acerca.texto': "This is a minigame I vibe-coded for my project 'SCP: The Black Silk Road', which will include it. It's an extra, but it turned out to be fun, so I'm publishing it to have a bit more going on while I keep developing the main project. Support me on Patreon, and thanks for playing!",
   'acerca.texto2': "Since the game is vibe-coded and is simply a minigame for my project, I have no problem with you modifying, extracting, repackaging or continuing it; I only ask for the appropriate audit. You can find the code here: {link}",
   'acerca.patreon': 'Support me on Patreon',
+  'acerca.creditos': 'Code under the MIT license · Music composed by MrPretendo with Strudel · Icons by Lucide (ISC)',
   'patreon.holo': 'Thanks for playing — visit my page to learn more about my project SCP The Black Silk Road',
   'ctl.titulo': 'CONTROLS', 'ctl.mover': 'Move', 'ctl.flechas': 'Arrows', 'ctl.dash': 'Turbo dash', 'ctl.espacio': 'SPACE',
   'ctl.cola': 'Cross your own tail', 'ctl.colaD': 'Jumps over it, costs energy',

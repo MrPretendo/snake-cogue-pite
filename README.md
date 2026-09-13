@@ -94,7 +94,12 @@ tools/build-artifact.sh <directorio>
 Copia la página (`artifact/page.html` → `index.html`) y sus archivos de apoyo
 en sus rutas relativas. No hay bundler: `src/` llega tal cual.
 
-## Créditos
+## Licencia y créditos
 
-- Iconos: [Lucide](https://lucide.dev), licencia ISC, © Lucide Icons and Contributors.
-- Soundtrack y todo lo demás: MrPretendo.
+Código bajo licencia **MIT** (ver `LICENSE`): úsalo, modifícalo y redistribúyelo
+con atribución.
+
+- **Música**: *Snake Cogue Pite*, compuesta por MrPretendo con
+  [Strudel](https://strudel.cc). Si la reutilizas, acredita al autor.
+- **Iconos**: [Lucide](https://lucide.dev), licencia ISC, © Lucide Icons and Contributors.
+- Todo lo demás: MrPretendo.
