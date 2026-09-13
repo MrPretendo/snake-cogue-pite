@@ -18,6 +18,7 @@
 import { inyectarSprite, ico } from './iconos.mjs';
 import * as sfx from './sonido.mjs';
 import * as musica from './musica.mjs';
+import * as ranking from './ranking.mjs';
 import * as fx from './fx.mjs';
 import { T, idioma, alternarIdioma } from './idioma.mjs';
 
@@ -219,6 +220,14 @@ const records = { puntos: 0, cola: 4 };
 const ENLACE_PATREON = 'https://www.patreon.com/c/MrPretendo';
 const ENLACE_GITHUB = 'https://github.com/MrPretendo/snake-cogue-pite';
 
+// Ranking (Supabase, plan gratuito). La clave es la publica: las reglas de la
+// tabla (tools/ranking.sql) deciden que puede hacer un visitante.
+const RANKING = {
+  url: 'https://fhdfagvisnflioygciir.supabase.co',
+  clave: 'sb_publishable_Q7no2Zy9_fP6DXafte3W2w_523Btu3A'
+};
+ranking.configurar(RANKING);
+
 function calculateXpNext(level) {
   // Progresión exponencial ajustada a la XP nerfeada de frutas (5 a 14 XP):
   // - Nivel 1: 20 XP (~4 frutas normales o 2 especiales)
@@ -407,6 +416,7 @@ function marcadoUI() {
     '      <div class="sr-menu__title">SNAKE COGUE PITE</div>',
     '      <button type="button" class="sr-btn-restart sr-menu__btn" data-act="jugar">' + ico('jugar') + ' ' + T('menu.jugar') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="controles">' + ico('mando') + ' ' + T('menu.controles') + '</button>',
+    '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="ranking">' + ico('trofeo') + ' ' + T('menu.ranking') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="acerca">' + ico('vida') + ' ' + T('menu.acerca') + '</button>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn sr-menu__idioma" data-act="idioma" data-idioma="' + idioma() + '" title="' + T('menu.idiomaTitulo') + '"><b data-on="es">ES</b><i>·</i><b data-on="en">EN</b></button>',
     '      <div class="sr-menu__record">' + T('menu.record', { pts: 0, cola: 4 }) + '</div>',
@@ -429,6 +439,12 @@ function marcadoUI() {
     '        <dt><span class="sr-footer__kbd">M</span></dt><dd>' + T('ctl.sonidoD') + '</dd>',
     '        <dt><span class="sr-footer__kbd">L</span></dt><dd>' + T('ctl.idiomaD') + '</dd>',
     '      </dl>',
+    '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="volver">' + T('menu.volver') + '</button>',
+    '    </div>',
+    '    <div class="sr-menu sr-menu--ranking" data-panel="ranking" data-visible="0">',
+    '      <div class="sr-modal-title">' + ico('trofeo') + ' ' + T('rank.titulo') + '</div>',
+    '      <ol class="sr-ranking"></ol>',
+    '      <div class="sr-ranking__estado"></div>',
     '      <button type="button" class="sr-btn-secundario sr-menu__btn" data-act="volver">' + T('menu.volver') + '</button>',
     '    </div>',
     '    <div class="sr-menu sr-menu--acerca" data-panel="acerca" data-visible="0">',
@@ -474,6 +490,11 @@ function marcadoUI() {
     '        <div class="sr-stat-item"><span class="sr-stat-val sr-stat-time">0s</span><span class="sr-stat-lbl">' + T('fin.tiempo') + '</span></div>',
     '      </div>',
     '      <div class="sr-summary-bote"></div>',
+    '      <form class="sr-summary-ranking" data-act="form-ranking">',
+    '        <input class="sr-summary-nombre" type="text" maxlength="12" placeholder="' + T('rank.nombre') + '" autocomplete="off" spellcheck="false">',
+    '        <button type="submit" class="sr-btn-secundario sr-summary-enviar">' + ico('trofeo') + ' ' + T('rank.enviar') + '</button>',
+    '        <span class="sr-summary-ranking__estado"></span>',
+    '      </form>',
     '      <div class="sr-summary-botones">',
     '        <button type="button" class="sr-btn-restart" data-act="restart">' + T('fin.otra') + '</button>',
     '        <button type="button" class="sr-btn-secundario" data-act="menu">' + T('fin.menu') + '</button>',
@@ -549,6 +570,13 @@ function construirUI() {
     menuPrincipal: q('.sr-menu[data-panel="principal"]'),
     menuControles: q('.sr-menu[data-panel="controles"]'),
     menuAcerca: q('.sr-menu[data-panel="acerca"]'),
+    menuRanking: q('.sr-menu[data-panel="ranking"]'),
+    rankingLista: q('.sr-ranking'),
+    rankingEstado: q('.sr-ranking__estado'),
+    formRanking: q('.sr-summary-ranking'),
+    nombreRanking: q('.sr-summary-nombre'),
+    enviarRanking: q('.sr-summary-enviar'),
+    estadoEnvio: q('.sr-summary-ranking__estado'),
     menuRecord: q('.sr-menu__record'),
     modalMecanica: q('.sr-modal-mecanica'),
     mecanicasGrid: q('.sr-cards-grid--mecanicas'),
@@ -561,6 +589,8 @@ function construirUI() {
   if (inst.ro) inst.ro.disconnect();
   inst.ro = new ResizeObserver(onResize);
   inst.ro.observe(inst.els.viewport);
+
+  inst.els.formRanking.addEventListener('submit', enviarPuntuacion);
 
   if (inst.els.botonSonido && sfx.estaSilenciado()) {
     inst.els.botonSonido.innerHTML = ico('silencio');
@@ -1920,6 +1950,56 @@ function mostrarPanel(nombre) {
   inst.els.menuPrincipal.dataset.visible = nombre === 'principal' ? '1' : '0';
   inst.els.menuControles.dataset.visible = nombre === 'controles' ? '1' : '0';
   inst.els.menuAcerca.dataset.visible = nombre === 'acerca' ? '1' : '0';
+  inst.els.menuRanking.dataset.visible = nombre === 'ranking' ? '1' : '0';
+  if (nombre === 'ranking') cargarRanking();
+}
+
+// ---- ranking ----------------------------------------------------------------
+
+async function cargarRanking() {
+  const e = inst.els;
+  e.rankingLista.innerHTML = '';
+  e.rankingEstado.textContent = T('rank.cargando');
+  if (!ranking.disponible()) { e.rankingEstado.textContent = T('rank.sinConexion'); return; }
+  try {
+    const filas = await ranking.top(10);
+    if (!inst || !e.rankingLista.isConnected) return;
+    e.rankingEstado.textContent = filas.length ? '' : T('rank.vacio');
+    e.rankingLista.innerHTML = filas.map((f, i) => [
+      `<li class="sr-ranking__fila${i === 0 ? ' sr-ranking__fila--top' : ''}">`,
+      `  <span class="sr-ranking__pos">${i + 1}</span>`,
+      `  <span class="sr-ranking__nombre">${escapar(f.nombre)}</span>`,
+      `  <span class="sr-ranking__mec">${escapar(f.mecanica || '')}</span>`,
+      `  <span class="sr-ranking__pts">${formatoNumero(f.puntos)} ${T('rank.pts')}</span>`,
+      `</li>`
+    ].join('')).join('');
+  } catch (err) {
+    e.rankingEstado.textContent = T('rank.sinConexion');
+  }
+}
+
+function escapar(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function enviarPuntuacion(ev) {
+  ev.preventDefault();
+  const g = inst.game;
+  const e = inst.els;
+  if (!g || g.enviado) return;
+  const nombre = ranking.limpiarNombre(e.nombreRanking.value);
+  if (!nombre) { e.estadoEnvio.textContent = T('rank.nombreVacio'); return; }
+  e.enviarRanking.disabled = true;
+  e.estadoEnvio.textContent = T('rank.cargando');
+  try {
+    await ranking.enviar({ nombre, puntos: g.puntos, cola: g.maxTailAchieved, tiempo: g.runTime, mecanica: g.mecanica.nombre });
+    g.enviado = true;
+    e.estadoEnvio.textContent = T('rank.enviado');
+    sfx.tocar('cobrar', { monedas: 6 });
+  } catch (err) {
+    e.estadoEnvio.textContent = T('rank.error');
+    e.enviarRanking.disabled = false;
+  }
 }
 
 function mostrarControles(ver) { mostrarPanel(ver ? 'controles' : 'principal'); }
@@ -2020,6 +2100,11 @@ function gameOver(reason) {
   inst.els.statJackpot.textContent = T('fin.tiradasV', { t: g.tiradas, x: g.triples });
   inst.els.statRacha.textContent = `x${multiplicadorRacha(g.rachaMax).toFixed(2)}`;
   inst.els.summaryBote.textContent = notaBote;
+  g.enviado = false;
+  inst.els.formRanking.dataset.visible = ranking.disponible() ? '1' : '0';
+  inst.els.nombreRanking.value = ranking.nombreGuardado();
+  inst.els.enviarRanking.disabled = false;
+  inst.els.estadoEnvio.textContent = '';
   inst.els.footerRecord.innerHTML = '';
   inst.els.footerRecord.append(inst.els.footerMecanica, ' · ' + T('pie.record', { pts: records.puntos, cola: records.cola }));
   inst.els.modalSummary.dataset.visible = '1';
@@ -2611,6 +2696,8 @@ function onClick(ev) {
     mostrarControles(true);
   } else if (act === 'acerca') {
     mostrarPanel('acerca');
+  } else if (act === 'ranking') {
+    mostrarPanel('ranking');
   } else if (act === 'volver') {
     mostrarControles(false);
   }
@@ -2630,6 +2717,9 @@ function onKeyDown(ev) {
   sfx.activar();
   musica.activar();
   const g = inst.game;
+
+  // Escribiendo el nombre: el teclado es del campo, no del juego
+  if (ev.target && ev.target.tagName === 'INPUT') return;
 
   if (ev.key === 'm' || ev.key === 'M') {
     alternarSonido();

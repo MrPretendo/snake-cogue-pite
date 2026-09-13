@@ -85,6 +85,19 @@ producto. **Rebobinar** (R) vuelve a sortear.
 
 Todas las cifras son constantes al principio de `src/app.mjs`.
 
+## Ranking
+
+Tabla de puntuaciones en Supabase (plan gratuito) vía su API REST
+(`src/ranking.mjs`). Al morir, el resumen pide un nombre (12 caracteres, sin
+cuenta) y lo envía; el menú tiene un panel **Ranking** con el top 10. La clave
+que va en el código es la *publishable*, pública por diseño: lo que puede
+hacer un visitante lo fijan las reglas de la tabla — `tools/ranking.sql`,
+pegar en el SQL Editor de Supabase — (insertar una fila válida y leer; nada de
+editar ni borrar; topes por CHECK). Sin conexión, o donde el anfitrión bloquee
+`fetch` (el visor de artifacts de claude.ai lo hace), el juego lo dice y sigue.
+Un ranking anónimo desde JS es trucable por definición: aquí se mitiga, no se
+elimina.
+
 ## Publicar el paquete
 
 ```bash

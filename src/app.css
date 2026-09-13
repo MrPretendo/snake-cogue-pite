@@ -830,6 +830,120 @@
   color: #64748B;
 }
 
+/* Ranking */
+.sr-menu--ranking {
+  max-width: 460px;
+  gap: 10px;
+}
+
+.sr-ranking {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sr-ranking__fila {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 10px;
+  border: 1px solid rgba(0, 229, 255, 0.14);
+  border-radius: 4px;
+  background: rgba(0, 229, 255, 0.03);
+  font-size: 12px;
+}
+
+.sr-ranking__fila--top {
+  border-color: rgba(255, 213, 79, 0.6);
+  box-shadow: 0 0 14px rgba(255, 213, 79, 0.25);
+}
+
+.sr-ranking__pos {
+  font-family: Consolas, monospace;
+  font-weight: 800;
+  color: #64748B;
+}
+
+.sr-ranking__fila--top .sr-ranking__pos { color: #FFD54F; }
+
+.sr-ranking__nombre {
+  font-weight: 700;
+  color: #F1F5FB;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sr-ranking__mec {
+  font-size: 10px;
+  color: #64748B;
+  white-space: nowrap;
+}
+
+.sr-ranking__pts {
+  font-family: Consolas, monospace;
+  font-weight: 700;
+  color: #FFD54F;
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-ranking__estado {
+  font-size: 11px;
+  color: #94A3B8;
+  min-height: 15px;
+}
+
+.sr-summary-ranking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sr-summary-ranking[data-visible="0"] { display: none; }
+
+.sr-summary-nombre {
+  width: 150px;
+  padding: 7px 10px;
+  background: #0B1220;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #F1F5FB;
+  font: 700 12px Consolas, monospace;
+  letter-spacing: 0.05em;
+  outline: none;
+}
+
+.sr-summary-nombre:focus {
+  border-color: #00E5FF;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
+}
+
+.sr-summary-enviar {
+  padding: 7px 14px;
+  font-size: 11px;
+}
+
+.sr-summary-enviar:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.sr-summary-ranking__estado {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: #94A3B8;
+  min-height: 14px;
+}
+
 .sr-acerca__patreon {
   text-decoration: none;
   display: inline-flex;
