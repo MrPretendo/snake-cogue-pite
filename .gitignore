@@ -4,8 +4,3 @@ build/
 Thumbs.db
 *.log
 promo/
-cover*.png
-cover_b64.txt
-make_art.py
-*.zip
-tools/package.js
